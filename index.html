@@ -2032,7 +2032,7 @@ function renderProfile(p,leaderboard,tgUser){
     '<div style="padding:24px;text-align:center;color:var(--muted);font-size:12px">История матчей появится после игр</div>';
   const c=JSON.parse(localStorage.getItem('bor_profile')||'{}');
   const xp=c.xp??340;
-  const name=[user.first_name,user.last_name].filter(Boolean).join(' ');
+  const displayName=[user.first_name,user.last_name].filter(Boolean).join(' ');
   const achs=[
     {l:'Первый матч',e:true,svg:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 9 Q12 12 21 9 M3 15 Q12 12 21 15"/></svg>'},
     {l:'Турнирист',e:true,svg:'<svg viewBox="0 0 24 24"><path d="M8 4 L16 4 L15 13 Q15 16 12 16 Q9 16 9 13 Z"/><line x1="12" y1="16" x2="12" y2="20"/><line x1="8" y1="21" x2="16" y2="21"/></svg>'},
@@ -2046,7 +2046,7 @@ function renderProfile(p,leaderboard,tgUser){
   document.getElementById('prof-content').innerHTML=`
     <div class="prof-header">
       <div class="prof-av">${photoUrl?`<img src="${photoUrl}" onerror="this.style.display='none'">`:''}${!photoUrl?(initials.toUpperCase()||'?'):''}</div>
-      <div class="prof-name">${name||'Игрок'}</div>
+      <div class="prof-name">${displayName||name||'Игрок'}</div>
       ${user.username?`<div class="prof-un">@${user.username}</div>`:''}
       <div class="prof-lvl"><div class="prof-lvl-badge">${level}</div><div class="prof-xp">${rating} очков</div></div>
       <div class="lvl-bar-wrap"><div class="lvl-bar" style="width:${prog}%"></div></div>
