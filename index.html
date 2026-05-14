@@ -1635,7 +1635,7 @@ html,body{height:100%;background:#000;color:var(--ink);font-family:'Manrope',san
 </div>
 
 <script>
-const API_URL = 'https://api.padeltennisbor.ru';
+const API_URL = 'https://web-production-a316a.up.railway.app';
 const tgApp = window.Telegram?.WebApp;
 if(tgApp){tgApp.ready();tgApp.expand();try{tgApp.setHeaderColor('#1a3a1a');tgApp.setBackgroundColor('#f5f5f0')}catch{}}
 
@@ -1806,7 +1806,7 @@ async function loadSparring(){
   list.innerHTML='<div class="loader"><div class="spin"></div></div>';
   try{const r=await fetch(`${API_URL}/api/sparring/matches`);spMatches=await r.json()}catch{spMatches=mockMatches()}
   renderMatches();
-  try{const r2=await fetch(`${API_URL}/api/sparring/my_matches?tg_user_id=${user.id}`);renderMyMatches(await r2.json())}catch{renderMyMatches([])}
+  try{const r2=await fetch(`${API_URL}/api/sparring/matches/my?user_id=${user.id}`);renderMyMatches(await r2.json())}catch{renderMyMatches([])}
   try{const r3=await fetch(`${API_URL}/api/sparring/requests`);renderSparRequests(await r3.json())}catch{renderSparRequests([])}
 }
 
@@ -1832,7 +1832,7 @@ function renderSparRequests(reqs){
   if(!reqs||!reqs.length){list.innerHTML='<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 48 48"><rect x="10" y="6" width="28" height="36" rx="2"/><line x1="16" y1="14" x2="32" y2="14"/><line x1="16" y1="22" x2="32" y2="22"/><line x1="16" y1="30" x2="26" y2="30"/></svg></div><div class="empty-title">Заявок нет</div><div class="empty-text">Создайте заявку на поиск партнёра</div></div>';return}
   list.innerHTML=reqs.map(r=>`<div class="match-card fu">
     <div class="mc-head"><div class="mc-title">${fmtMap[r.format]||r.format||'Матч'}</div><span class="badge grey">Ищу партнёра</span></div>
-    <div class="mc-info"><span>NTRP ${r.ntrp_min||''}–${r.ntrp_max||''}</span><span>· ${r.user_name||''}</span>${r.preferred_time?`<span>· ${r.preferred_time}</span>`:''}</div>
+    <div class="mc-info"><span>NTRP ${r.ntrp_level||''}</span><span>· ${r.user_name||''}</span>${r.preferred_time?`<span>· ${r.preferred_time}</span>`:''}</div>
     ${r.comment?`<div style="font-size:12px;color:var(--muted);margin-top:8px;font-style:italic">«${r.comment}»</div>`:''}
   </div>`).join('');
 }
@@ -1849,19 +1849,25 @@ function renderMatches(){
   const lvlMap={beginner:'Новичок',amateur:'Любитель',advanced:'Продвинутый',pro:'Про'};
   if(!spMatches.length){list.innerHTML='<div class="empty-state"><div class="empty-icon"><svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="18"/><path d="M10 18 Q24 24 38 18 M10 30 Q24 24 38 30"/></svg></div><div class="empty-title">Матчей пока нет</div><div class="empty-text">Создайте первый матч</div></div>';return}
   list.innerHTML=spMatches.map((m,i)=>{
-    const slots=Array.from({length:m.slots},(_,i)=>`<div class="slot ${i<m.filled?'filled':''}">${i<m.filled?(i+1):''}</div>`).join('');
-    const isMine=String(m.user_id)===String(user.id);
-    return`<div class="match-card fu" data-level="${m.level}" data-sport="${m.sport}">
-      <div class="mc-head"><div class="mc-title">${m.sport==='padel'?'Падел':'Теннис'}</div><div class="badge ${m.level==='pro'?'lime':'outline'}">${lvlMap[m.level]}</div></div>
+    const total=m.slots_total||m.slots||2;
+    const taken=m.slots_taken||m.filled||1;
+    const slots=Array.from({length:total},(_,i)=>`<div class="slot ${i<taken?'filled':''}">${i<taken?(i+1):''}</div>`).join('');
+    const isMine=String(m.organizer_id||m.user_id)===String(user.id);
+    const fmtLabel={single:'Одиночный',double:'Парный',mixed:'Микст'}[m.format]||m.format||'';
+    const ntrp=m.ntrp_min&&m.ntrp_max?`NTRP ${m.ntrp_min}–${m.ntrp_max}`:(m.level?lvlMap[m.level]:'');
+    return`<div class="match-card fu">
+      <div class="mc-head"><div class="mc-title">${m.title||'Матч'}</div><div class="badge outline">${fmtLabel}</div></div>
       <div class="mc-info">
-        <span>${fmtDate(m.date)}</span>
-        <span>· ${m.user_name}</span>
-        ${m.comment?`<span style="display:block;width:100%;font-style:italic;color:var(--muted);margin-top:4px">«${m.comment}»</span>`:''}
+        <span>${fmtDate(m.play_date||m.date)}</span>
+        <span>· ${m.organizer_name||m.user_name||''}</span>
+        ${m.court?`<span>· Корт ${m.court}</span>`:''}
+        ${ntrp?`<span>· ${ntrp}</span>`:''}
+        ${m.description?`<span style="display:block;width:100%;font-style:italic;color:var(--muted);margin-top:4px">«${m.description}»</span>`:''}
       </div>
       <div class="mc-slots">${slots}</div>
       <div style="display:flex;gap:8px;margin-top:14px">
-        ${!isMine&&m.filled<m.slots?`<button class="btn btn-primary" style="flex:1;padding:12px" onclick="joinMatch('${m.id}')">Присоединиться</button>`:''}
-        ${isMine?`<button class="btn btn-danger" style="padding:12px 18px" onclick="deleteMatch('${m.id}')">Удалить</button>`:''}
+        ${!isMine&&taken<total?`<button class="btn btn-primary" style="flex:1;padding:12px" onclick="joinMatch(${m.id})">Присоединиться</button>`:''}
+        ${isMine?`<button class="btn btn-danger" style="padding:12px 18px" onclick="deleteMatch(${m.id})">Удалить</button>`:''}
       </div>
     </div>`;
   }).join('');
@@ -1876,13 +1882,16 @@ function renderRequests(reqs){
 async function joinMatch(id){
   haptic('medium');if(!await ensureAuth())return;
   const user=getTgUser();
-  try{await fetch(`${API_URL}/api/sparring/join`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({match_id:id,tg_user_id:user.id})})}catch{}
+  try{await fetch(`${API_URL}/api/sparring/matches/${id}/join`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:user.id,first_name:user.first_name||null,last_name:user.last_name||null,username:user.username||null})})}catch{}
   const m=spMatches.find(x=>x.id===id);if(m&&m.filled<m.slots)m.filled++;
   renderMatches();toast('Вы в&nbsp;матче');
 }
 
 async function deleteMatch(id){
-  haptic();spMatches=spMatches.filter(m=>m.id!==id);renderMatches();toast('Матч удалён');
+  haptic();
+  const user=getTgUser();
+  try{await fetch(`${API_URL}/api/sparring/matches/${id}?user_id=${user.id}`,{method:'DELETE'})}catch{}
+  spMatches=spMatches.filter(m=>m.id!==id);renderMatches();toast('Матч удалён');
 }
 
 async function createMatch(){
@@ -1893,7 +1902,7 @@ async function createMatch(){
   const date=document.getElementById('match-date').value;
   const comment=document.getElementById('match-comment').value;
   const m={id:'m'+Date.now(),sport,level,date,comment,slots:sport==='padel'?4:2,filled:1,user_id:user.id,user_name:user.first_name};
-  try{await fetch(`${API_URL}/api/sparring/matches`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({...m,tg_user_id:user.id})})}catch{}
+  try{await fetch(`${API_URL}/api/sparring/matches`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:user.id,first_name:user.first_name||null,last_name:user.last_name||null,username:user.username||null,format:sport==='padel'?'double':'single',title:`Матч · ${sport==='padel'?'Падел':'Теннис'}`,play_date:date,ntrp_min:parseFloat(document.getElementById('match-ntrp-min')?.value||'2'),ntrp_max:parseFloat(document.getElementById('match-ntrp-max')?.value||'5'),court:document.getElementById('match-court')?.value||null})})}catch{}
   spMatches.unshift(m);renderMatches();closeSheet();toast('Матч создан');
 }
 
@@ -2295,19 +2304,19 @@ let leadAgeGroup='adult';let giftAmount=1000;const ALL_ACHIEVEMENTS=[
 ];
 async function submitSparringRequest(){
   haptic('medium');const user=getTgUser();const format=document.getElementById('sr-format').value;const ntrp_min=document.getElementById('sr-ntrp-min').value;const ntrp_max=document.getElementById('sr-ntrp-max').value;const time=document.getElementById('sr-time').value;const comment=document.getElementById('sr-comment').value;
-  try{await fetch(`${API_URL}/api/sparring/requests`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tg_user_id:user.id,format,ntrp_min,ntrp_max,preferred_time:time,comment})});closeSheet();toast('Заявка опубликована');if(loadSparring)loadSparring();}catch(e){toast('Ошибка',true);}
+  try{await fetch(`${API_URL}/api/sparring/requests`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:user.id,first_name:user.first_name||null,last_name:user.last_name||null,username:user.username||null,format,ntrp_level:ntrp_min||'3.0',preferred_time:time,comment})});closeSheet();toast('Заявка опубликована');if(loadSparring)loadSparring();}catch(e){toast('Ошибка',true);}
 }
 async function submitLead(){
   haptic('medium');const name=document.getElementById('lead-name').value.trim();const type=document.getElementById('lead-contact-type').value;const contact=document.getElementById('lead-contact').value.trim();
   if(!name||!contact){toast('Заполните все поля',true);return}const user=getTgUser();
-  try{await fetch(`${API_URL}/api/leads`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tg_user_id:user.id,name,age_group:leadAgeGroup,contact_type:type,contact_value:contact})});closeSheet();toast('Заявка на пробное занятие отправлена');}catch(e){toast('Ошибка',true);}
+  try{await fetch(`${API_URL}/api/leads`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,age_group:leadAgeGroup,contact_type:type,contact_value:contact})});closeSheet();toast('Заявка на пробное занятие отправлена');}catch(e){toast('Ошибка',true);}
 }
 function toggleLeadAge(btn,val){haptic();leadAgeGroup=val;document.querySelectorAll('.toggle-group .toggle-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
 function selectGiftChip(chip,amount){haptic();giftAmount=amount;document.getElementById('gift-amount').value=amount;document.querySelectorAll('.chips .chip').forEach(c=>c.classList.remove('active'));chip.classList.add('active');}
 async function submitGift(){
   haptic('medium');const sender=document.getElementById('gift-sender').value.trim();const recipient=document.getElementById('gift-recipient').value.trim();const amount=parseInt(document.getElementById('gift-amount').value)||giftAmount;const type=document.getElementById('gift-contact-type').value;const contact=document.getElementById('gift-contact').value.trim();
   if(!sender||!contact||!amount){toast('Заполните обязательные поля',true);return}const user=getTgUser();
-  try{await fetch(`${API_URL}/api/gifts`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tg_user_id:user.id,sender_name:sender,recipient_name:recipient,amount,contact_type:type,contact_value:contact})});closeSheet();toast('Сертификат заказан');}catch(e){toast('Ошибка',true);}
+  try{await fetch(`${API_URL}/api/gifts`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:sender,amount:parseInt(amount)||0,contact_type:type,contact_value:contact,comment:recipient?`Кому: ${recipient}`:null})});closeSheet();toast('Сертификат заказан');}catch(e){toast('Ошибка',true);}
 }
 function openAchievements(){
   const grid=document.getElementById('achievements-grid');if(!grid)return;const profileData=JSON.parse(sessionStorage.getItem('profileData')||'{}');
