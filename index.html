@@ -66,9 +66,9 @@ html,body{height:100%;background:#000;color:var(--ink);font-family:'Manrope',san
   pointer-events:none;
 }
 .ob-track-wrap{flex:1;overflow:hidden;position:relative;z-index:1}
-.ob-track{display:flex;height:100%;width:500%;transition:transform .55s cubic-bezier(.2,.8,.2,1);will-change:transform}
+.ob-track{display:flex;height:100%;width:400%;transition:transform .55s cubic-bezier(.2,.8,.2,1);will-change:transform}
 .ob-slide{
-  width:20%;height:100%;
+  width:25%;height:100%;
   padding:80px 36px 24px;
   display:flex;flex-direction:column;
   align-items:flex-start;justify-content:center;
@@ -1253,17 +1253,7 @@ html,body{height:100%;background:#000;color:var(--ink);font-family:'Manrope',san
       </div>
 
       <div class="ob-slide">
-        <div class="ob-num">04 · Маркет</div>
-        <svg class="ob-crest" viewBox="0 0 60 60">
-          <path d="M14 18 L46 18 L42 48 L18 48 Z"/>
-          <path d="M22 18 L22 12 Q22 8 30 8 Q38 8 38 12 L38 18"/>
-        </svg>
-        <div class="ob-title">Маркет<span class="it">внутри клуба</span></div>
-        <div class="ob-text">Ракетки, мячи, экипировка. Покупай и&nbsp;продавай в&nbsp;сообществе игроков.</div>
-      </div>
-
-      <div class="ob-slide">
-        <div class="ob-num">05 · Telegram</div>
+        <div class="ob-num">04 · Telegram</div>
         <svg class="ob-crest" viewBox="0 0 60 60">
           <path d="M52 14 L8 28 L22 34 L42 22 L26 38 L38 50 Z"/>
         </svg>
@@ -1277,7 +1267,6 @@ html,body{height:100%;background:#000;color:var(--ink);font-family:'Manrope',san
   <div class="ob-footer">
     <div class="ob-dots" id="ob-dots">
       <div class="ob-dot active"></div>
-      <div class="ob-dot"></div>
       <div class="ob-dot"></div>
       <div class="ob-dot"></div>
       <div class="ob-dot"></div>
@@ -1657,7 +1646,7 @@ function toast(txt,err){
 
 // ── ONBOARDING ──
 let obIdx=0;
-const OB_TOTAL=5;
+const OB_TOTAL=4;
 
 function checkOnboarding(){
   if(localStorage.getItem('bor_ob_done')){
