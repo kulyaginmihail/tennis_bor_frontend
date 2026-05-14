@@ -1664,6 +1664,7 @@ function checkOnboarding(){
     document.getElementById('onboarding').style.display='none';
     init();
   }
+  _initObSwipe();
 }
 
 function renderOb(){
@@ -1678,6 +1679,22 @@ function nextSlide(){
   if(obIdx>=OB_TOTAL-1){skipOnboarding();return}
   obIdx++;
   renderOb();
+}
+
+function _initObSwipe(){
+  const wrap=document.getElementById('onboarding');
+  if(!wrap)return;
+  let x0=null,y0=null;
+  wrap.addEventListener('touchstart',e=>{x0=e.touches[0].clientX;y0=e.touches[0].clientY;},{passive:true});
+  wrap.addEventListener('touchend',e=>{
+    if(x0===null)return;
+    const dx=e.changedTouches[0].clientX-x0;
+    const dy=e.changedTouches[0].clientY-y0;
+    x0=null;y0=null;
+    if(Math.abs(dx)<Math.abs(dy)||Math.abs(dx)<40)return;
+    if(dx<0){nextSlide();}
+    else if(obIdx>0){haptic();obIdx--;renderOb();}
+  },{passive:true});
 }
 
 function skipOnboarding(){
