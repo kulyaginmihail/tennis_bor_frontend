@@ -830,6 +830,14 @@ html,body{height:100%;background:#000;color:var(--ink);font-family:'Manrope',san
   transition:color .3s;
 }
 .coach-card:active .coach-initials{color:var(--lime-deep)}
+.coach-photo{
+  width:88px;height:88px;
+  border-radius:50%;
+  object-fit:cover;object-position:center top;
+  margin-bottom:18px;
+  border:2px solid var(--green);
+  display:block;
+}
 .coach-name{
   font-family:'Unbounded',sans-serif;
   font-size:15px;font-weight:600;
@@ -881,6 +889,15 @@ html,body{height:100%;background:#000;color:var(--ink);font-family:'Manrope',san
   letter-spacing:-.05em;line-height:1;
   color:var(--lime);position:relative;z-index:1;
   margin-bottom:24px;
+}
+.coach-detail-photo{
+  width:120px;height:120px;
+  border-radius:50%;
+  object-fit:cover;object-position:center top;
+  margin-bottom:24px;
+  border:3px solid var(--lime);
+  position:relative;z-index:1;
+  display:block;
 }
 .coach-detail-hero .nm{
   font-family:'Unbounded',sans-serif;
@@ -2096,17 +2113,18 @@ async function loadCoaches(){
 }
 
 function mockCoaches(){return[
-  {id:'c1',name:'Буренина Екатерина Михайловна',role:'Тренер по&nbsp;теннису',initials:'БЕМ',sport:'tennis',price:3000,tags:['Теннис','Дети','Взрослые','ITF'],bio:'Победитель и&nbsp;финалист турниров TE, ITF, РТТ, UTR. Опыт работы 3 года (дети и&nbsp;взрослые всех возрастов). Тренировалась в&nbsp;ведущих академиях Европы (Сербия, Италия, Германия, Турция). Входила в&nbsp;топ-10 в&nbsp;одиночке до&nbsp;17 и&nbsp;19 лет, топ-5 в&nbsp;паре до&nbsp;19 лет по&nbsp;Сербии. Участвовала в&nbsp;ITF, ITF 15k, 25k, 35k. Студентка РУС «ГЦОЛИФК» по&nbsp;специальности тренер по&nbsp;теннису.',formats:['Индивидуальные тренировки','Групповые занятия','Тренировки для детей','Тренировки для взрослых']},
-  {id:'c2',name:'Конышев Семён Семёнович',role:'Тренер по&nbsp;теннису',initials:'КСС',sport:'tennis',price:3000,tags:['Теннис','Мастер спорта','Дети','Взрослые'],bio:'Мастер спорта. Опыт работы 4 года (дети и&nbsp;взрослые всех возрастов). Имел опыт работы с&nbsp;Еленой Весниной, Юлией Путинцевой, Марией Тимофеевой. Тренировался в&nbsp;Сербии, Черногории и&nbsp;Хорватии. Наивысший рейтинг РТТ: топ-9 одиночка до&nbsp;19 лет, пара топ-6 до&nbsp;19 лет. Игрок команды сборной Москвы по&nbsp;теннису. Участвовал в&nbsp;турнирах TE, ITF и&nbsp;ITF 15k.',formats:['Индивидуальные тренировки','Спарринги','Тренировки для детей','Групповые занятия']},
-  {id:'c3',name:'Морозов Александр Валерьевич',role:'Тренер по&nbsp;теннису и&nbsp;падел',initials:'МАВ',sport:'padel',price:3000,tags:['Теннис','Падел','КМС','Экс-сборная России'],bio:'Тренерский стаж более трёх лет. Бывший член сборной России по&nbsp;теннису. Победитель и&nbsp;призёр турниров РТТ и&nbsp;ТЕ, звание КМС. Призёр турниров по&nbsp;паделу. Ученики — призёры турниров РТТ и&nbsp;Pro Am.',formats:['Индивидуальные тренировки','Падел-тренировки','Спарринги','Подготовка к&nbsp;турнирам']},
-  {id:'c4',name:'Чесных Иван Валерьевич',role:'Тренер по&nbsp;теннису и&nbsp;падел',initials:'ЧИВ',sport:'tennis',price:3000,tags:['Теннис','Падел','ОФП','20+ лет'],bio:'20+ лет в&nbsp;профессиональном теннисе. Призёр международных турниров (Европа, США). Победитель турниров РТТ. Высшее образование (тренер по&nbsp;теннису). Сертифицированный детский тренер по&nbsp;программе 10\'S. 10+ лет тренерского опыта. Был главным тренером ТЦ Воскресенск. Тренирую падел более 1 года.',formats:['Индивидуальные тренировки','Сплит (2 человека)','Спарринги','ОФП / функциональная подготовка','Сборы (Россия и&nbsp;выездные)']}
+  {id:'c1',name:'Буренина Екатерина Михайловна',role:'Тренер по&nbsp;теннису',initials:'БЕМ',photo:'https://raw.githubusercontent.com/kulyaginmihail/tennis_bor_frontend/main/coaches/burenina.jpg',sport:'tennis',price:3000,tags:['Теннис','Дети','Взрослые','ITF'],bio:'Победитель и&nbsp;финалист турниров TE, ITF, РТТ, UTR. Опыт работы 3 года (дети и&nbsp;взрослые всех возрастов). Тренировалась в&nbsp;ведущих академиях Европы (Сербия, Италия, Германия, Турция). Входила в&nbsp;топ-10 в&nbsp;одиночке до&nbsp;17 и&nbsp;19 лет, топ-5 в&nbsp;паре до&nbsp;19 лет по&nbsp;Сербии. Участвовала в&nbsp;ITF, ITF 15k, 25k, 35k. Студентка РУС «ГЦОЛИФК» по&nbsp;специальности тренер по&nbsp;теннису.',formats:['Индивидуальные тренировки','Групповые занятия','Тренировки для детей','Тренировки для взрослых']},
+  {id:'c2',name:'Конышев Семён Семёнович',role:'Тренер по&nbsp;теннису',initials:'КСС',photo:'https://raw.githubusercontent.com/kulyaginmihail/tennis_bor_frontend/main/coaches/konyshev.jpg',sport:'tennis',price:3000,tags:['Теннис','Мастер спорта','Дети','Взрослые'],bio:'Мастер спорта. Опыт работы 4 года (дети и&nbsp;взрослые всех возрастов). Имел опыт работы с&nbsp;Еленой Весниной, Юлией Путинцевой, Марией Тимофеевой. Тренировался в&nbsp;Сербии, Черногории и&nbsp;Хорватии. Наивысший рейтинг РТТ: топ-9 одиночка до&nbsp;19 лет, пара топ-6 до&nbsp;19 лет. Игрок команды сборной Москвы по&nbsp;теннису. Участвовал в&nbsp;турнирах TE, ITF и&nbsp;ITF 15k.',formats:['Индивидуальные тренировки','Спарринги','Тренировки для детей','Групповые занятия']},
+  {id:'c3',name:'Морозов Александр Валерьевич',role:'Тренер по&nbsp;теннису и&nbsp;падел',initials:'МАВ',photo:'https://raw.githubusercontent.com/kulyaginmihail/tennis_bor_frontend/main/coaches/morozov.jpg',sport:'padel',price:3000,tags:['Теннис','Падел','КМС','Экс-сборная России'],bio:'Тренерский стаж более трёх лет. Бывший член сборной России по&nbsp;теннису. Победитель и&nbsp;призёр турниров РТТ и&nbsp;ТЕ, звание КМС. Призёр турниров по&nbsp;паделу. Ученики — призёры турниров РТТ и&nbsp;Pro Am.',formats:['Индивидуальные тренировки','Падел-тренировки','Спарринги','Подготовка к&nbsp;турнирам']},
+  {id:'c4',name:'Чесных Иван Валерьевич',role:'Тренер по&nbsp;теннису и&nbsp;падел',initials:'ЧИВ',photo:'https://raw.githubusercontent.com/kulyaginmihail/tennis_bor_frontend/main/coaches/chesnykh.jpg',sport:'tennis',price:3000,tags:['Теннис','Падел','ОФП','20+ лет'],bio:'20+ лет в&nbsp;профессиональном теннисе. Призёр международных турниров (Европа, США). Победитель турниров РТТ. Высшее образование (тренер по&nbsp;теннису). Сертифицированный детский тренер по&nbsp;программе 10\'S. 10+ лет тренерского опыта. Был главным тренером ТЦ Воскресенск. Тренирую падел более 1 года.',formats:['Индивидуальные тренировки','Сплит (2 человека)','Спарринги','ОФП / функциональная подготовка','Сборы (Россия и&nbsp;выездные)']}
 ]}
 
 function renderCoaches(){
   const list=document.getElementById('coaches-list');
   list.innerHTML=coachesData.map(c=>`
     <div class="coach-card fu" data-sport="${c.sport}" onclick="openCoach('${c.id}')">
-      <div class="coach-initials">${c.initials||'ТР'}</div>
+      ${c.photo?`<img class="coach-photo" src="${c.photo}" alt="${c.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`:''}
+      <div class="coach-initials" style="${c.photo?'display:none':''}">${ c.initials||'ТР'}</div>
       <div class="coach-name">${c.name}</div>
       <div class="coach-role">${c.role}</div>
       <div class="coach-tags">${(c.tags||[]).map(t=>`<div class="coach-tag">${t}</div>`).join('')}</div>
@@ -2123,7 +2141,8 @@ function openCoach(id){
   const c=coachesData.find(x=>x.id===id);if(!c)return;
   document.getElementById('coach-detail-body').innerHTML=`
     <div class="coach-detail-hero">
-      <div class="ini">${c.initials||'ТР'}</div>
+      ${c.photo?`<img class="coach-detail-photo" src="${c.photo}" alt="${c.name}" onerror="this.style.display='none';this.nextElementSibling.style.display='block'">`:``}
+      <div class="ini" style="${c.photo?'display:none':''}">${c.initials||'ТР'}</div>
       <div class="rl">${c.role}</div>
       <div class="nm">${c.name}</div>
     </div>
