@@ -348,7 +348,7 @@ html,body{height:100%;background:#000;color:var(--ink);font-family:'Manrope',san
   position:relative;z-index:1;
 }
 .hero-tag::before{content:'';width:18px;height:1px;background:var(--lime)}
-.hero-crest{position:relative;z-index:1;color:var(--cream);margin-bottom:18px;width:56px;height:auto;display:block}
+.hero-crest{position:relative;z-index:1;margin-bottom:18px;width:80px;height:80px;border-radius:50%;object-fit:cover;display:block;border:1.5px solid rgba(255,255,255,.18)}
 .hero-title{
   font-family:'Unbounded',sans-serif;
   font-size:38px;font-weight:800;
@@ -1306,18 +1306,7 @@ html,body{height:100%;background:#000;color:var(--ink);font-family:'Manrope',san
   <div class="screen from-tab active" id="screen-home">
     <div class="hero fu">
       <div class="hero-tag">Лесной клуб</div>
-      <svg class="hero-crest crest" viewBox="0 0 200 240">
-        <path d="M100 8 C100 8, 188 28, 188 78 L188 152 C188 196, 144 220, 100 232 C56 220, 12 196, 12 152 L12 78 C12 28, 100 8, 100 8 Z"/>
-        <polygon class="fill" points="100,30 88,52 112,52"/>
-        <polygon class="fill" points="100,42 84,66 116,66"/>
-        <polygon class="fill" points="100,54 80,80 120,80"/>
-        <rect class="fill" x="96" y="80" width="8" height="6"/>
-        <ellipse cx="62" cy="130" rx="22" ry="28" transform="rotate(-30 62 130)"/>
-        <line x1="46" y1="148" x2="30" y2="180" stroke-width="2.5"/>
-        <path d="M138 102 C160 102, 168 118, 162 140 C156 162, 142 162, 132 152 C124 144, 126 124, 138 102 Z" transform="rotate(20 145 132)"/>
-        <line x1="158" y1="148" x2="174" y2="180" stroke-width="2.5"/>
-        <circle cx="100" cy="156" r="7"/>
-      </svg>
+      <img class="hero-crest" src="https://raw.githubusercontent.com/kulyaginmihail/tennis_bor_frontend/main/logo.jpg" alt="БОР">
       <div class="hero-title">Падел<br>Теннис<span class="accent">Бор</span></div>
       <div class="hero-sub">Играй в&nbsp;лесу. Расти как&nbsp;спортсмен.</div>
     </div>
