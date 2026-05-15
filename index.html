@@ -1317,25 +1317,18 @@ html,body{height:100%;background:#000;color:var(--ink);font-family:'Manrope',san
     <div class="dir-list fu">
       <div class="dir-row" onclick="navToTab('sparring')">
         <div class="num">01</div>
-        <div class="name">Падел<span class="sub">Парный · Стены</span></div>
+        <div class="name">Падел</div>
         <div class="arrow"><svg viewBox="0 0 12 12"><path d="M2 6 L10 6 M6 2 L10 6 L6 10"/></svg></div>
       </div>
       <div class="dir-row" onclick="navToTab('sparring')">
         <div class="num">02</div>
-        <div class="name">Теннис<span class="sub">Классика · Открыто</span></div>
+        <div class="name">Теннис</div>
         <div class="arrow"><svg viewBox="0 0 12 12"><path d="M2 6 L10 6 M6 2 L10 6 L6 10"/></svg></div>
       </div>
     </div>
 
     <div class="section-label">События</div>
     <div class="promo-scroll fu">
-      <div class="promo-card lime" onclick="navToTab('tournaments')">
-        <div class="pl">Турнир сезона</div>
-        <div>
-          <div class="pn">Кубок<br>БОР</div>
-          <div class="pa">01.06 · 6 пар</div>
-        </div>
-      </div>
       <div class="promo-card" onclick="navToTab('sparring')">
         <div class="pl">Спарринги</div>
         <div>
@@ -1930,44 +1923,62 @@ function mockTournaments(){return[
 
 function renderTournaments(){
   const list=document.getElementById('tourn-list');
-  const stMap={active:'Идёт',open:'Запись',past:'Завершён'};
-  list.innerHTML=tournData.map((t,i)=>`
-    <div class="tourn-card fu" data-sport="${t.sport}" data-status="${t.status}" onclick="openTournament('${t.id}')">
+  const stMap={active:'Идёт',open:'Запись',upcoming:'Скоро',past:'Завершён'};
+  const stCls={active:'lime',open:'outline',upcoming:'outline',past:'grey'};
+  list.innerHTML=tournData.map((t,i)=>{
+    const title=t.title||t.name||'';
+    const price=t.entry_fee??t.price;
+    const date=t.play_date?fmtDate(t.play_date):(t.date||'');
+    const slots=t.max_participants?`${t.max_participants} уч.`:(t.pairs?`${t.pairs} пар · ${t.hours} ч`:'');
+    const fmt2=t.format||'';
+    const st=t.status||'open';
+    return`
+    <div class="tourn-card fu" data-sport="${t.sport}" data-status="${st}" onclick="openTournament(${t.id||"'"+t.id+"'"})">
       <div class="tourn-banner">
         <div class="tourn-banner-num">${String(i+1).padStart(2,'0')}</div>
-        <div class="tourn-banner-title">${t.name}</div>
+        <div class="tourn-banner-title">${title}</div>
       </div>
       <div class="tourn-body">
         <div class="tourn-meta">
-          <span class="badge ${t.status==='past'?'grey':(t.status==='active'?'lime':'outline')}">${stMap[t.status]||t.status}</span>
-          <span class="badge grey">${t.pairs} пар · ${t.hours} ч</span>
-          <span class="badge grey">${t.date}</span>
+          <span class="badge ${stCls[st]||'outline'}">${stMap[st]||st}</span>
+          ${slots?`<span class="badge grey">${slots}</span>`:''}
+          ${fmt2?`<span class="badge grey">${fmt2}</span>`:''}
+          ${date?`<span class="badge grey">${date}</span>`:''}
         </div>
         <div class="tourn-foot">
-          <div class="tourn-price">${fmt(t.price)}<span class="c">₽</span></div>
+          <div class="tourn-price">${price!=null?fmt(price):'—'}<span class="c">₽</span></div>
           <span class="tourn-arrow">Подробнее →</span>
         </div>
       </div>
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
 }
 
 function openTournament(id){
   haptic();
-  const t=tournData.find(x=>x.id===id);if(!t)return;
-  const stMap={active:'Идёт',open:'Запись открыта',past:'Завершён'};
+  const t=tournData.find(x=>String(x.id)===String(id));if(!t)return;
+  const stMap={active:'Идёт',open:'Запись открыта',upcoming:'Скоро открытие',past:'Завершён'};
+  const stCls={active:'lime',open:'outline',upcoming:'outline',past:'grey'};
+  const title=t.title||t.name||'';
+  const price=t.entry_fee??t.price;
+  const date=t.play_date?fmtDate(t.play_date):(t.date||'');
+  const desc=t.description||t.desc||'';
+  const slots=t.max_participants?`${t.max_participants} участников`:(t.pairs?`${t.pairs} пар · ${t.hours} ч`:'');
+  const format=t.format||'';
+  const st=t.status||'open';
   document.getElementById('tourn-detail-body').innerHTML=`
     <div class="detail-hero">
       <div class="ic">${t.sport==='padel'?'P':'T'}</div>
-      <div class="ttl">${t.name}</div>
+      <div class="ttl">${title}</div>
     </div>
     <div class="detail-body">
-      <div style="margin-bottom:18px"><span class="badge ${t.status==='past'?'grey':(t.status==='active'?'lime':'outline')}">${stMap[t.status]}</span></div>
-      <p style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:20px;font-weight:400">${t.desc}</p>
-      <div class="d-row"><div class="d-key">Формат</div><div class="d-val">${t.pairs} пар · ${t.hours} ч</div></div>
-      <div class="d-row"><div class="d-key">Дата</div><div class="d-val">${t.date}</div></div>
-      <div class="d-row"><div class="d-key">Стоимость</div><div class="d-val big">${fmt(t.price)} ₽</div></div>
-      ${t.status!=='past'?`<div style="margin-top:24px"><button class="btn btn-primary btn-full" onclick="regTournament('${t.id}')">Записаться</button></div>`:''}
+      <div style="margin-bottom:18px"><span class="badge ${stCls[st]||'outline'}">${stMap[st]||st}</span></div>
+      ${desc?`<p style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:20px;font-weight:400">${desc}</p>`:''}
+      ${format?`<div class="d-row"><div class="d-key">Формат</div><div class="d-val">${format}</div></div>`:''}
+      ${slots?`<div class="d-row"><div class="d-key">Участников</div><div class="d-val">${slots}</div></div>`:''}
+      ${date?`<div class="d-row"><div class="d-key">Дата</div><div class="d-val">${date}</div></div>`:''}
+      ${price!=null?`<div class="d-row"><div class="d-key">Стоимость</div><div class="d-val big">${fmt(price)} ₽</div></div>`:''}
+      ${st!=='past'?`<div style="margin-top:24px"><button class="btn btn-primary btn-full" onclick="regTournament('${t.id}')">Записаться</button></div>`:''}
     </div>`;
   navTo('tournament-detail');
 }
@@ -2037,7 +2048,7 @@ function renderProfile(p,leaderboard,tgUser){
       <div class="prof-av">${photoUrl?`<img src="${photoUrl}" onerror="this.style.display='none'">`:''}${!photoUrl?(initials.toUpperCase()||'?'):''}</div>
       <div class="prof-name">${displayName||name||'Игрок'}</div>
       ${user.username?`<div class="prof-un">@${user.username}</div>`:''}
-      <div class="prof-lvl"><div class="prof-lvl-badge">${level}</div><div class="prof-xp">${rating} очков</div></div>
+      <div class="prof-lvl"><div class="prof-lvl-badge">${level}</div></div>
       <div class="lvl-bar-wrap"><div class="lvl-bar" style="width:${prog}%"></div></div>
     </div>
 
@@ -2086,7 +2097,7 @@ let coachesData=[];
 async function loadCoaches(){
   const list=document.getElementById('coaches-list');
   list.innerHTML='<div class="loader"><div class="spin"></div></div>';
-  try{const r=await fetch(`${API_URL}/api/coaches`);coachesData=await r.json()}catch{coachesData=mockCoaches()}
+  try{const r=await fetch(`${API_URL}/api/coaches`);if(r.ok){const d=await r.json();coachesData=Array.isArray(d)?d:mockCoaches()}else{coachesData=mockCoaches()}}catch{coachesData=mockCoaches()}
   renderCoaches();
 }
 
