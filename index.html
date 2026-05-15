@@ -89,6 +89,13 @@ html,body{height:100%;background:#000;color:var(--ink);font-family:'Manrope',san
   margin-bottom:36px;
   opacity:.95;
 }
+.ob-crest-logo{
+  width:160px;height:160px;
+  object-fit:cover;
+  border-radius:50%;
+  margin-bottom:28px;
+  border:2px solid rgba(168,216,120,.3);
+}
 .ob-title{
   font-family:'Unbounded',sans-serif;
   font-size:34px;font-weight:700;
@@ -613,6 +620,7 @@ html,body{height:100%;background:#000;color:var(--ink);font-family:'Manrope',san
   font-weight:500;
 }
 .mc-info span{display:inline-flex;align-items:center;gap:6px}
+.username-link{color:var(--lime-deep);cursor:pointer;text-decoration:none;font-weight:600}
 
 .fab{
   position:fixed;bottom:calc(var(--nav-h) + var(--sb) + 18px);right:18px;
@@ -1229,18 +1237,7 @@ html,body{height:100%;background:#000;color:var(--ink);font-family:'Manrope',san
 
       <div class="ob-slide">
         <div class="ob-num">01 · Сосновый клуб</div>
-        <svg class="ob-crest" viewBox="0 0 200 240">
-          <path d="M100 8 C100 8, 188 28, 188 78 L188 152 C188 196, 144 220, 100 232 C56 220, 12 196, 12 152 L12 78 C12 28, 100 8, 100 8 Z" fill="none" stroke="currentColor" stroke-width="1.4"/>
-          <polygon points="100,30 88,52 112,52" fill="currentColor"/>
-          <polygon points="100,42 84,66 116,66" fill="currentColor"/>
-          <polygon points="100,54 80,80 120,80" fill="currentColor"/>
-          <rect x="96" y="80" width="8" height="6" fill="currentColor"/>
-          <ellipse cx="62" cy="130" rx="22" ry="28" fill="none" stroke="currentColor" stroke-width="1.4" transform="rotate(-30 62 130)"/>
-          <line x1="46" y1="148" x2="30" y2="180" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-          <path d="M138 102 C160 102, 168 118, 162 140 C156 162, 142 162, 132 152 C124 144, 126 124, 138 102 Z" fill="none" stroke="currentColor" stroke-width="1.4" transform="rotate(20 145 132)"/>
-          <line x1="158" y1="148" x2="174" y2="180" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>
-          <circle cx="100" cy="156" r="7" fill="none" stroke="currentColor" stroke-width="1.4"/>
-        </svg>
+        <img class="ob-crest-logo" src="https://raw.githubusercontent.com/kulyaginmihail/tennis_bor_frontend/main/logo.jpg" alt="БОР">
         <div class="ob-title">Падел<br>и&nbsp;теннис<span class="it">в&nbsp;лесной локации</span></div>
         <div class="ob-text">Два открытых корта, четыре тренера, тишина деревьев. Премиальный сезонный клуб.</div>
       </div>
@@ -1869,7 +1866,7 @@ function renderMatches(){
       <div class="mc-head"><div class="mc-title">${m.title||'Матч'}</div><div class="badge outline">${fmtLabel}</div></div>
       <div class="mc-info">
         <span>${fmtDate(m.play_date||m.date)}</span>
-        <span>· ${m.organizer_name||m.user_name||''}</span>
+        ${(m.organizer_username||m.user_username)?`<span>· <span class="username-link" onclick="openTgUser('${m.organizer_username||m.user_username}')">${m.organizer_name||m.user_name||''} ↗</span></span>`:`<span>· ${m.organizer_name||m.user_name||''}</span>`}
         ${m.court?`<span>· Корт ${m.court}</span>`:''}
         ${ntrp?`<span>· ${ntrp}</span>`:''}
         ${m.description?`<span style="display:block;width:100%;font-style:italic;color:var(--muted);margin-top:4px">«${m.description}»</span>`:''}
@@ -2318,6 +2315,7 @@ async function ensureAuth(){
 function fmt(n){return Number(n).toLocaleString('ru-RU')}
 function fmtDate(d){if(!d)return'';try{return new Date(d).toLocaleString('ru-RU',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}catch{return d}}
 function openTgChannel(){if(tgApp)tgApp.openLink('https://t.me/padel_tennis_borr');else window.open('https://t.me/padel_tennis_borr')}
+function openTgUser(username){if(!username)return;const u=username.replace(/^@/,'');if(tgApp)tgApp.openTelegramLink(`https://t.me/${u}`);else window.open(`https://t.me/${u}`)}
 function openSite(){if(tgApp)tgApp.openLink('https://padeltennisbor.ru');else window.open('https://padeltennisbor.ru')}
 
 
