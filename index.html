@@ -1328,20 +1328,14 @@ html,body{height:100%;background:#000;color:var(--ink);font-family:'Manrope',san
     </div>
 
     <div class="section-label">События</div>
-    <div class="promo-scroll fu">
+    <div class="promo-scroll fu" id="events-scroll">
       <div class="promo-card" onclick="navToTab('sparring')">
         <div class="pl">Спарринги</div>
-        <div>
-          <div class="pn">Открытые<br>матчи</div>
-          <div class="pa">Каждый день</div>
-        </div>
+        <div><div class="pn">Открытые<br>матчи</div></div>
       </div>
       <div class="promo-card cream" onclick="navTo('prices')">
         <div class="pl">Промо</div>
-        <div>
-          <div class="pn">−7%<br>за&nbsp;репост</div>
-          <div class="pa">На любой абонемент</div>
-        </div>
+        <div><div class="pn">−7%<br>за&nbsp;репост</div></div>
       </div>
     </div>
 
@@ -1605,11 +1599,11 @@ html,body{height:100%;background:#000;color:var(--ink);font-family:'Manrope',san
 <!-- SETTINGS SHEET -->
 <div class="bottom-sheet" id="sheet-settings">
   <div class="sh-handle"></div>
-  <div class="sh-title">Настройки</div>
+  <div class="sh-title">Меню</div>
   <div class="sh-body">
-    <div class="set-item" onclick="openTgChannel()"><div class="set-l"><div class="set-ico"><svg viewBox="0 0 18 18"><path d="M16 2 L2 9 L7 11 L13 6 L8 12 L12 16 Z"/></svg></div><div class="set-lbl">Telegram-канал</div></div><div class="set-arr">›</div></div>
-    <div class="set-item" onclick="openSite()"><div class="set-l"><div class="set-ico"><svg viewBox="0 0 18 18"><circle cx="9" cy="9" r="7"/><path d="M2 9 L16 9 M9 2 Q13 9 9 16 Q5 9 9 2"/></svg></div><div class="set-lbl">Сайт клуба</div></div><div class="set-arr">›</div></div>
     <div class="set-item" onclick="navTo('about');closeSheet()"><div class="set-l"><div class="set-ico"><svg viewBox="0 0 18 18"><circle cx="9" cy="9" r="7"/><line x1="9" y1="6" x2="9" y2="6.5"/><line x1="9" y1="9" x2="9" y2="13"/></svg></div><div class="set-lbl">О клубе</div></div><div class="set-arr">›</div></div>
+    <div class="set-item" onclick="openTgChannel();closeSheet()"><div class="set-l"><div class="set-ico"><svg viewBox="0 0 18 18"><path d="M16 2 L2 9 L7 11 L13 6 L8 12 L12 16 Z"/></svg></div><div class="set-lbl">Telegram-канал</div></div><div class="set-arr">›</div></div>
+    <div class="set-item" onclick="openSite();closeSheet()"><div class="set-l"><div class="set-ico"><svg viewBox="0 0 18 18"><circle cx="9" cy="9" r="7"/><path d="M2 9 L16 9 M9 2 Q13 9 9 16 Q5 9 9 2"/></svg></div><div class="set-lbl">Сайт клуба</div></div><div class="set-arr">›</div></div>
     <div class="set-item" onclick="resetOnboarding()"><div class="set-l"><div class="set-ico"><svg viewBox="0 0 18 18"><path d="M3 9 Q3 3 9 3 Q13 3 15 6 L13 8 L17 8 L17 4"/><path d="M15 9 Q15 15 9 15 Q5 15 3 12 L5 10 L1 10 L1 14"/></svg></div><div class="set-lbl">Повторить онбординг</div></div><div class="set-arr">›</div></div>
     <div style="height:14px"></div>
     <button class="btn btn-danger btn-full" onclick="logOut()">Выйти из&nbsp;профиля</button>
@@ -2071,7 +2065,7 @@ function renderProfile(p,leaderboard,tgUser){
     <div class="card" style="padding:0;margin:0 16px 8px">${histRows}</div>
 
     <div style="padding:18px 16px 0;display:flex;flex-direction:column;gap:8px">
-      <button class="btn btn-ghost btn-full" onclick="openSheet('sheet-settings')">Настройки</button>
+      <button class="btn btn-ghost btn-full" onclick="openSheet('sheet-settings')">Меню</button>
       <button class="btn btn-danger btn-full" onclick="logOut()">Выйти</button>
     </div>
     <div style="height:8px"></div>
@@ -2345,10 +2339,32 @@ async function ensureUserRegistered(){
   localStorage.setItem(k,'1');return true;
 }
 
+// ── EVENTS (home screen) ──
+async function loadHomeEvents(){
+  const scroll=document.getElementById('events-scroll');
+  if(!scroll)return;
+  try{
+    const r=await fetch(`${API_URL}/api/events`);
+    if(!r.ok)return;
+    const events=await r.json();
+    if(!Array.isArray(events)||events.length===0)return;
+    const linkMap={sparring:()=>navToTab('sparring'),tournaments:()=>navToTab('tournaments'),prices:()=>navTo('prices'),coaches:()=>navTo('coaches'),about:()=>navTo('about')};
+    scroll.innerHTML=events.map(e=>{
+      const cls=e.color==='lime'?'lime':(e.color==='cream'?'cream':'');
+      const onclick=e.link_to&&linkMap[e.link_to]?`navTo${e.link_to==='sparring'||e.link_to==='tournaments'?'Tab':''}('${e.link_to}')`:''
+      return`<div class="promo-card${cls?' '+cls:''}" onclick="${onclick}">
+        ${e.subtitle?`<div class="pl">${e.subtitle}</div>`:''}
+        <div><div class="pn">${e.title.replace(' ','<br>')}</div></div>
+      </div>`;
+    }).join('');
+  }catch{}
+}
+
 // ── INIT ──
 function init(){
   ensureUserRegistered();
   navToTab('home');
+  loadHomeEvents();
   setTimeout(()=>{loadSparring();loadTournaments()},800);
 }
 
