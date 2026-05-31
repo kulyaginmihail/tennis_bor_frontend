@@ -187,7 +187,17 @@ html,body{height:100%;background:#000;color:var(--ink);font-family:'Manrope',san
   border-bottom:1.5px solid currentColor;
   transform:rotate(45deg);
 }
-#hdr-right{width:36px}
+#hdr-right{width:36px;display:flex;align-items:center;justify-content:flex-end}
+#btn-refresh{
+  background:none;border:none;cursor:pointer;padding:6px;
+  color:var(--green);display:none;
+  width:32px;height:32px;align-items:center;justify-content:center;
+  border-radius:50%;transition:background .15s;
+}
+#btn-refresh:active{background:rgba(0,0,0,.07)}
+#btn-refresh svg{width:18px;height:18px;transition:transform .5s ease}
+#btn-refresh.spinning svg{animation:spin360 .6s linear infinite}
+@keyframes spin360{to{transform:rotate(360deg)}}
 
 /* ═══ MAIN ═══ */
 #main{flex:1;overflow:hidden;position:relative;background:var(--cream)}
@@ -1296,7 +1306,14 @@ html,body{height:100%;background:#000;color:var(--ink);font-family:'Manrope',san
 <div id="header">
   <button id="btn-back" onclick="navBack()"><span class="arr"></span><span>Назад</span></button>
   <span id="header-title">БОР</span>
-  <div id="hdr-right"></div>
+  <div id="hdr-right">
+    <button id="btn-refresh" onclick="refreshCurrentTab()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 8V3M21 8h-5"/>
+        <path d="M21 12a9 9 0 0 1-15 6.7L3 16M3 16v5M3 16h5"/>
+      </svg>
+    </button>
+  </div>
 </div>
 
 <!-- ════ MAIN ════ -->
@@ -1599,6 +1616,18 @@ html,body{height:100%;background:#000;color:var(--ink);font-family:'Manrope',san
   </div>
 </div>
 
+<!-- TOURNAMENT REGISTER SHEET -->
+<div class="bottom-sheet" id="sheet-tourn-reg">
+  <div class="sh-handle"></div>
+  <div class="sh-title">Записаться на турнир</div>
+  <div class="sh-body">
+    <div id="tourn-reg-name-row" class="fg"><label class="fl">Имя</label><input type="text" class="fi" id="tourn-reg-name" placeholder="Ваше имя"></div>
+    <div class="fg"><label class="fl">Телефон или Telegram</label><input type="text" class="fi" id="tourn-reg-contact" placeholder="+7 900 000 00 00 или @username"></div>
+    <div class="fg"><label class="fl">Комментарий</label><input type="text" class="fi" id="tourn-reg-comment" placeholder="Уровень игры, вопросы..."></div>
+    <button class="btn btn-primary btn-full" style="margin-bottom:12px" onclick="submitTournamentReg()">Отправить заявку</button>
+  </div>
+</div>
+
 <!-- SETTINGS SHEET -->
 <div class="bottom-sheet" id="sheet-settings">
   <div class="sh-handle"></div>
@@ -1744,7 +1773,23 @@ function navBack(){
 function updateHeader(id){
   const titles={home:'БОР',sparring:'Спарринг',tournaments:'Турниры',market:'Маркет',profile:'Профиль',coaches:'Тренеры',prices:'Цены',about:'О клубе',reviews:'Отзывы',advert:'Реклама','coach-detail':'Тренер','tournament-detail':'Турнир'};
   document.getElementById('header-title').textContent=titles[id]||'БОР';
-  document.getElementById('btn-back').style.display=TAB_IDS.includes(id)?'none':'inline-flex';
+  const isTab=TAB_IDS.includes(id);
+  document.getElementById('btn-back').style.display=isTab?'none':'inline-flex';
+  document.getElementById('btn-refresh').style.display=isTab?'flex':'none';
+}
+
+async function refreshCurrentTab(){
+  const btn=document.getElementById('btn-refresh');
+  btn.classList.add('spinning');
+  try{
+    if(currentTab==='home'){await loadHomeEvents()}
+    else if(currentTab==='sparring'){await loadSparring()}
+    else if(currentTab==='tournaments'){await loadTournaments()}
+    else if(currentTab==='profile'){await loadProfile()}
+  }finally{
+    btn.classList.remove('spinning');
+    haptic('light');
+  }
 }
 
 function updateNavIndicator(id){
@@ -1980,7 +2025,34 @@ function openTournament(id){
   navTo('tournament-detail');
 }
 
-async function regTournament(id){haptic('medium');if(!await ensureAuth())return;toast('Заявка отправлена')}
+let _regTournId=null;
+function regTournament(id){
+  haptic('medium');
+  _regTournId=id;
+  // Prefill name from Telegram user if available
+  const u=getTgUser();
+  const name=[u?.first_name,u?.last_name].filter(Boolean).join(' ');
+  document.getElementById('tourn-reg-name').value=name||'';
+  document.getElementById('tourn-reg-contact').value=u?.username?('@'+u.username):'';
+  document.getElementById('tourn-reg-comment').value='';
+  openSheet('sheet-tourn-reg');
+}
+
+async function submitTournamentReg(){
+  const name=document.getElementById('tourn-reg-name').value.trim();
+  const contact=document.getElementById('tourn-reg-contact').value.trim();
+  if(!name){toast('Введите имя','error');return;}
+  if(!contact){toast('Введите контакт','error');return;}
+  haptic('medium');
+  try{
+    const r=await fetch(`${API_URL}/api/tournaments/${_regTournId}/register`,{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({name,contact,comment:document.getElementById('tourn-reg-comment').value.trim()||null})
+    });
+    if(!r.ok)throw new Error();
+    closeSheet();toast('Заявка отправлена! Мы свяжемся с вами');
+  }catch{toast('Ошибка отправки','error');}
+}
 
 
 // ── PROFILE ──
